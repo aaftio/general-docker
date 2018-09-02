@@ -1,0 +1,3 @@
+[submodule "cloudflare-ddns"]
+	path = cloudflare-ddns
+	url = git@github.com:aaftio/docker-cloudflare.git
