@@ -8,5 +8,5 @@ RUN go get -ldflags "-X main.VERSION=$(date -u +%Y%m%d) -s -w" github.com/xtaci/
 
 FROM alpine:3.8
 COPY --from=builder /go/bin /bin
-EXPOSE 29900
+EXPOSE 29900/udp
 EXPOSE 12948
