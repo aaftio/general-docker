@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # ==============Configurate iptables===================
 # Create new chain
@@ -21,12 +21,37 @@ iptables -t nat -A SHADOWSOCKS -d 192.168.0.0/16 -j RETURN
 iptables -t nat -A SHADOWSOCKS -d 224.0.0.0/4 -j RETURN
 iptables -t nat -A SHADOWSOCKS -d 240.0.0.0/4 -j RETURN
 
+# All CHN IPs will bypass the proxy
+for i in $(cat /CHN-IPs)
+do
+  iptables -t nat -A SHADOWSOCKS -d $i -j RETURN
+done
+
 # Anything else should be redirected to shadowsocks's local port
 iptables -t nat -A SHADOWSOCKS -p tcp -j REDIRECT --to-ports 1080
 
 # Add any UDP rules
 ip route add local default dev lo table 100
 ip rule add fwmark 1 lookup 100
+
+# Ignore LANs and any other addresses you'd like to bypass the proxy
+# See Wikipedia and RFC5735 for full list of reserved networks.
+iptables -t mangle -A SHADOWSOCKS -d 0.0.0.0/8 -j RETURN
+iptables -t mangle -A SHADOWSOCKS -d 10.0.0.0/8 -j RETURN
+iptables -t mangle -A SHADOWSOCKS -d 127.0.0.0/8 -j RETURN
+iptables -t mangle -A SHADOWSOCKS -d 169.254.0.0/16 -j RETURN
+iptables -t mangle -A SHADOWSOCKS -d 172.16.0.0/12 -j RETURN
+iptables -t mangle -A SHADOWSOCKS -d 192.168.0.0/16 -j RETURN
+iptables -t mangle -A SHADOWSOCKS -d 224.0.0.0/4 -j RETURN
+iptables -t mangle -A SHADOWSOCKS -d 240.0.0.0/4 -j RETURN
+
+# All CHN IPs will bypass the proxy
+for i in $(cat /CHN-IPs)
+do
+  iptables -t mangle -A SHADOWSOCKS -d $i -j RETURN
+done
+
+# Any DNS query (destination dns server not in CHN) will go through proxy, to prevent DNS cache pollution. TODO: (write a description about this)
 iptables -t mangle -A SHADOWSOCKS -p udp --dport 53 -j TPROXY --on-port 1080 --tproxy-mark 0x01/0x01
 
 # Apply the rules

@@ -36,5 +36,9 @@ RUN apk add --no-cache strongswan \
     && mv /etc/ipsec.conf /etc/ipsec.conf.bak \
     && mv /etc/ipsec.secrets /etc/ipsec.secrets.bak
 
+ADD delegated-apnic-latest /delegated-apnic-latest
+RUN /bin/cat /delegated-apnic-latest | awk -F '|' '/CN/&&/ipv4/ {print $4 "/" 32-log($5)/log(2)}' | cat > /CHN-IPs \
+    && rm -rf /delegated-apnic-latest
+
 ADD entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["sh", "/entrypoint.sh"]
