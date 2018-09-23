@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 SS_CONFIG=${SS_CONFIG:-""}
 SS_MODULE=${SS_MODULE:-"ss-server"}
