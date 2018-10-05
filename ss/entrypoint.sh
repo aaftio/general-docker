@@ -1,16 +1,28 @@
-#!/bin/sh
+#!/bin/bash
 
-SS_CONFIG=${SS_CONFIG:-""}
-SS_MODULE=${SS_MODULE:-"ss-server"}
+set -e
 
-while getopts "s:m:" OPT; do
-    case $OPT in
-        s)
-            SS_CONFIG=$OPTARG;;
-        m)
-            SS_MODULE=$OPTARG;;
-    esac
+: ${SS_MODULE:="ss-server"}
+: ${SS_CONFIG:=""}
+unset BAN_CHN_IP
+
+while getopts "s:m:b" OPT; do
+  case $OPT in
+    s)
+      SS_CONFIG=$OPTARG;;
+    m)
+      SS_MODULE=$OPTARG;;
+    b)
+      BAN_CHN_IP=true;;
+  esac
 done
+
+if [ ! -z $BAN_CHN_IP ]; then
+  /bin/bash /update-iptables.sh
+
+  # star crond
+  /usr/sbin/crond
+fi
 
 if [ "$SS_CONFIG" != "" ]; then
     echo -e "\033[32mStarting shadowsocks......\033[0m"
