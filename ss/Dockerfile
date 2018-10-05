@@ -5,7 +5,7 @@ ENV SS_LIBEV_VERSION 3.2.0
 ENV SS_DOWNLOAD_URL https://github.com/shadowsocks/shadowsocks-libev/releases/download/v${SS_LIBEV_VERSION}/shadowsocks-libev-${SS_LIBEV_VERSION}.tar.gz
 
 RUN apk upgrade \
-    && apk add curl iptables \
+    && apk add curl iptables bash \
     && apk add --no-cache --virtual .build-deps \
         autoconf \
         automake \
