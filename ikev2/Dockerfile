@@ -32,7 +32,7 @@ RUN apk upgrade \
     && rm -rf shadowsocks-libev-${SS_LIBEV_VERSION}.tar.gz \
         shadowsocks-libev-${SS_LIBEV_VERSION}
 
-RUN apk add --no-cache strongswan \
+RUN apk add --no-cache strongswan curl bash \
     && mv /etc/ipsec.conf /etc/ipsec.conf.bak \
     && mv /etc/ipsec.secrets /etc/ipsec.secrets.bak
 
@@ -41,4 +41,7 @@ RUN /bin/cat /delegated-apnic-latest | awk -F '|' '/CN/&&/ipv4/ {print $4 "/" 32
     && rm -rf /delegated-apnic-latest
 
 ADD entrypoint.sh /entrypoint.sh
+ADD update-iptables.sh /update-iptables.sh
+ADD crontab var/spool/cron/crontabs/root
+
 ENTRYPOINT ["sh", "/entrypoint.sh"]

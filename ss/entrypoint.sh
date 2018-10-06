@@ -20,7 +20,7 @@ done
 if [ ! -z $BAN_CHN_IP ]; then
   /bin/bash /update-iptables.sh
 
-  # star crond
+  # Start crond
   /usr/sbin/crond
 fi
 

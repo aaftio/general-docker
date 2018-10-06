@@ -11,7 +11,7 @@ done
 /bin/cat /delegated-apnic-latest | awk -F '|' '/CN/&&/ipv4/ {print $4 "/" 32-log($5)/log(2)}' | cat > /CHN-IPs
 
 
-iptables -t filter -L SHADOWSOCKS >/dev/null 2>&1 \
+iptables -t filter -n -L SHADOWSOCKS >/dev/null 2>&1 \
   || (iptables -t filter -N SHADOWSOCKS && iptables -t filter -A OUTPUT -m state --state NEW -j SHADOWSOCKS)
 
 iptables -t filter -F SHADOWSOCKS
