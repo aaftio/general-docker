@@ -37,9 +37,6 @@ RUN apk add --no-cache strongswan curl bash \
     && mv /etc/ipsec.secrets /etc/ipsec.secrets.bak
 
 ADD delegated-apnic-latest /delegated-apnic-latest
-RUN /bin/cat /delegated-apnic-latest | awk -F '|' '/CN/&&/ipv4/ {print $4 "/" 32-log($5)/log(2)}' | cat > /CHN-IPs \
-    && rm -rf /delegated-apnic-latest
-
 ADD entrypoint.sh /entrypoint.sh
 ADD update-iptables.sh /update-iptables.sh
 ADD crontab var/spool/cron/crontabs/root
