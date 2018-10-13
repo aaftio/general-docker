@@ -41,4 +41,4 @@ ADD entrypoint.sh /entrypoint.sh
 ADD update-iptables.sh /update-iptables.sh
 ADD crontab var/spool/cron/crontabs/root
 
-ENTRYPOINT ["sh", "/entrypoint.sh"]
+ENTRYPOINT ["bash", "/entrypoint.sh"]

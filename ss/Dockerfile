@@ -37,4 +37,4 @@ ADD update-iptables.sh /update-iptables.sh
 ADD crontab /var/spool/cron/crontabs/root
 ADD delegated-apnic-latest /delegated-apnic-latest
 
-ENTRYPOINT ["sh", "/entrypoint.sh"]
+ENTRYPOINT ["bash", "/entrypoint.sh"]
