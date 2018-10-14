@@ -73,4 +73,6 @@ done
 iptables -t nat -A POSTROUTING -j MASQUERADE
 
 # hungup the bash
-bash
+while true; do
+  sleep 1h
+done
