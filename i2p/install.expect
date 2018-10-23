@@ -1,0 +1,12 @@
+#!/usr/bin/expect
+set jar_file_name [lindex $argv 0];
+set i2p_path [lindex $argv 1];
+
+spawn java -jar /$jar_file_name -console
+expect "*continue*"
+send 1
+expect "*path*"
+send $i2p_path
+expect "*continue*"
+send 1
+expect eof
