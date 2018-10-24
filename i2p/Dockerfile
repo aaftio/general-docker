@@ -6,12 +6,15 @@ ENV JAR_FILE_NAME i2pinstall_0.9.37.jar
 ENV I2P_PATH /i2p
 
 RUN apk add curl expect --no-cache \
-  && curl -sSLO ${I2P_DOWNLOAD_URL} \
-  && apk del curl
+  && curl -sSLO ${I2P_DOWNLOAD_URL}
 
 COPY install.expect /
 RUN expect /install.expect ${JAR_FILE_NAME} ${I2P_PATH} && rm -rf /install.expect /$JAR_FILE_NAME
 
 COPY entrypoint.sh /
+RUN chmod +x /entrypoint.sh
 
-ENTRYPOINT ["sh", "/entrypoint.sh", "${I2P_PATH}"]
+EXPOSE 7657
+VOLUME ["/root/.i2p"]
+
+ENTRYPOINT ["sh", "-c", "/entrypoint.sh $I2P_PATH"]

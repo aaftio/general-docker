@@ -4,9 +4,9 @@ set i2p_path [lindex $argv 1];
 
 spawn java -jar /$jar_file_name -console
 expect "*continue*"
-send 1
+send "1\r"
 expect "*path*"
-send $i2p_path
+send "$i2p_path\r"
 expect "*continue*"
-send 1
+send "1\r"
 expect eof
