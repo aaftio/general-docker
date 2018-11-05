@@ -1,3 +1,6 @@
 [submodule "cloudflare-ddns"]
 	path = cloudflare-ddns
 	url = git@github.com:aaftio/docker-cloudflare.git
+[submodule "bitcoin-core/bitcoin"]
+	path = bitcoin-core/bitcoin
+	url = https://github.com/bitcoin/bitcoin.git
