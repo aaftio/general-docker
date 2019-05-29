@@ -4,3 +4,6 @@
 [submodule "bitcoin-core/bitcoin"]
 	path = bitcoin-core/bitcoin
 	url = https://github.com/bitcoin/bitcoin.git
+[submodule "rsshub/RSSHub"]
+	path = rsshub/RSSHub
+	url = https://github.com/aaftio/RSSHub.git
