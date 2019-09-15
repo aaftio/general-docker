@@ -7,3 +7,6 @@
 [submodule "rsshub/RSSHub"]
 	path = rsshub/RSSHub
 	url = https://github.com/aaftio/RSSHub.git
+[submodule "frp/frp"]
+	path = frp/frp
+	url = https://github.com/fatedier/frp.git
