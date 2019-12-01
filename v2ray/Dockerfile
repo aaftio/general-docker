@@ -12,7 +12,7 @@ COPY --from=builder /usr/bin/v2ray/v2ray /usr/bin/v2ray/
 COPY --from=builder /usr/bin/v2ray/v2ctl /usr/bin/v2ray/
 COPY --from=builder /usr/bin/v2ray/geoip.dat /usr/bin/v2ray/
 COPY --from=builder /usr/bin/v2ray/geosite.dat /usr/bin/v2ray/
-COPY --from-builder /etc/v2ray/config.json
+COPY --from-builder /etc/v2ray/config.json /etc/v2ray/
 
 RUN apk --no-cache add ca-certificates \
   && mkdir /var/log/v2ray \
@@ -25,9 +25,9 @@ ENV PATH /usr/bin/v2ray:$PATH
 
 RUN apk --no-cache add curl bash iptables
 
-COPY entrypoint.sh /entrypoint.sh
-COPY update-iptables.sh /update-iptables.sh
+COPY entrypoint.sh /
+COPY update-iptables.sh /
 COPY crontab /var/spool/cron/crontabs/root
-COPY delegated-apnic-latest /delegated-apnic-latest
+COPY delegated-apnic-latest /
 
 ENTRYPOINT ["bash", "/entrypoint.sh"]
