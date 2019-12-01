@@ -2,7 +2,9 @@ FROM ubuntu:18.04 as builder
 
 RUN apt-get update
 RUN apt-get install curl -y
-RUN bash <(curl -L -s https://install.direct/go.sh)
+RUN curl -L -o /tmp/go.sh https://install.direct/go.sh
+RUN chmod +x /tmp/go.sh
+RUN /tmp/go.sh
 
 FROM alpine:3.10.3
 
