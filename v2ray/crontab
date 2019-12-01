@@ -1,0 +1,1 @@
+0 20 * * * /bin/bash /update-iptables.sh -d
