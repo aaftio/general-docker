@@ -23,5 +23,8 @@ iptables -t mangle -A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss --
 # =============Start IKEv2 server=====================
 ipsec start
 
-# =============Start ss-redir========================
-ss-redir -s $SS_SERVER_HOST -p $SS_SERVER_PORT -b 0.0.0.0 -l 1080 -m $SS_ENCRYPT_METHOD -k $SS_PASSWORD $SS_APPEND_CONFIG
+# =============Start ss-redir daemon==================
+ss-redir -s $SS_SERVER_HOST -p $SS_SERVER_PORT -b 0.0.0.0 -l 1080 -m $SS_ENCRYPT_METHOD -k $SS_PASSWORD $SS_APPEND_CONFIG &
+
+# =============Start v2ray============================
+v2ray -config=/etc/v2ray/config.json

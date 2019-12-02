@@ -1,11 +1,33 @@
-FROM alpine:3.8
+FROM ubuntu:18.04 as builder
+
+RUN apt-get update
+RUN apt-get install curl -y
+RUN curl -L -o /tmp/go.sh https://install.direct/go.sh
+RUN chmod +x /tmp/go.sh
+RUN /tmp/go.sh
+
+FROM alpine:3.10.3
 LABEL maintainer="panhaipeng <panhaipeng1989@gmail.com>"
 
-ENV SS_LIBEV_VERSION 3.2.0
+# Install v2ray
+COPY --from=builder /usr/bin/v2ray/v2ray /usr/bin/v2ray/
+COPY --from=builder /usr/bin/v2ray/v2ctl /usr/bin/v2ray/
+COPY --from=builder /usr/bin/v2ray/geoip.dat /usr/bin/v2ray/
+COPY --from=builder /usr/bin/v2ray/geosite.dat /usr/bin/v2ray/
+COPY --from=builder /etc/v2ray/config.json /etc/v2ray/
+
+RUN apk --no-cache add ca-certificates \
+  && mkdir /var/log/v2ray \
+  && chmod +x /usr/bin/v2ray/v2ctl \
+  && chmod +x /usr/bin/v2ray/v2ray
+
+ENV PATH /usr/bin/v2ray:$PATH
+
+# Install ss
+ENV SS_LIBEV_VERSION 3.3.3
 ENV SS_DOWNLOAD_URL https://github.com/shadowsocks/shadowsocks-libev/releases/download/v${SS_LIBEV_VERSION}/shadowsocks-libev-${SS_LIBEV_VERSION}.tar.gz
 
-RUN apk upgrade \
-    && apk add --no-cache --virtual .build-deps \
+RUN apk add --no-cache --virtual .build-deps \
         autoconf \
         automake \
         build-base \
@@ -32,13 +54,14 @@ RUN apk upgrade \
     && rm -rf shadowsocks-libev-${SS_LIBEV_VERSION}.tar.gz \
         shadowsocks-libev-${SS_LIBEV_VERSION}
 
-RUN apk add --no-cache strongswan curl bash \
+# Install strongswan and utils
+RUN apk add --no-cache iptables strongswan curl bash \
     && mv /etc/ipsec.conf /etc/ipsec.conf.bak \
     && mv /etc/ipsec.secrets /etc/ipsec.secrets.bak
 
-ADD delegated-apnic-latest /delegated-apnic-latest
-ADD entrypoint.sh /entrypoint.sh
-ADD update-iptables.sh /update-iptables.sh
-ADD crontab var/spool/cron/crontabs/root
+COPY delegated-apnic-latest /
+COPY entrypoint.sh /
+COPY update-iptables.sh /
+COPY crontab var/spool/cron/crontabs/root
 
 ENTRYPOINT ["bash", "/entrypoint.sh"]
