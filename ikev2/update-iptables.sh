@@ -60,7 +60,8 @@ iptables -t $IN_PROXY_TABLE -A $IN_PROXY_CHAIN -p udp --dport 53 -j TPROXY --on-
 # Proxy local machine traffic
 iptables -t $OUT_MARK_TABLE -n -L $OUT_MARK_CHAIN >/dev/null 2>&1 \
   || (iptables -t $OUT_MARK_TABLE -N $OUT_MARK_CHAIN \
-    && iptables -t $OUT_MARK_TABLE -A OUTPUT -p udp --dport 53 -j $OUT_MARK_CHAIN\
+    && iptables -t $OUT_MARK_TABLE -A OUTPUT -p udp --dport 53 -j $OUT_MARK_CHAIN \
+    && iptables -t $OUT_MARK_TABLE -A OUTPUT -p tcp -j $OUT_MARK_CHAIN \
     && ip route add local default dev lo table 100 \
     && ip rule add fwmark 1 table 100)
 
