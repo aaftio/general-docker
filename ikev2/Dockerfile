@@ -54,8 +54,8 @@ RUN apk add --no-cache --virtual .build-deps \
     && rm -rf shadowsocks-libev-${SS_LIBEV_VERSION}.tar.gz \
         shadowsocks-libev-${SS_LIBEV_VERSION}
 
-# Install strongswan and utils
-RUN apk add --no-cache iptables strongswan curl bash \
+# Install strongswan, dns server and utils
+RUN apk add --no-cache iptables strongswan bind curl bash \
     && mv /etc/ipsec.conf /etc/ipsec.conf.bak \
     && mv /etc/ipsec.secrets /etc/ipsec.secrets.bak
 
