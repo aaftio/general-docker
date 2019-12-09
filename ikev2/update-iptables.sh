@@ -26,12 +26,25 @@ reserved_networks=(\
 
 IN_PROXY_CHAIN="MY_IN_PROXY"
 IN_PROXY_TABLE="mangle"
+IN_CHN_IP_CHAIN="MY_IN_CHNIP"
+IN_CHN_IP_TABLE="mangle"
 OUT_MARK_CHAIN="MY_OUT_MARK"
 OUT_MARK_TABLE="mangle"
 
-# Proxy chain for VPN client
+SS_PROXY_PORT=1080
+V2RAY_PROXY_PORT=1081
+V2RAY_DIRECT_PORT=1082
+
+# Proxy chain for VPN client or local machine
 iptables -t $IN_PROXY_TABLE -n -L $IN_PROXY_CHAIN >/dev/null 2>&1 \
   || (iptables -t $IN_PROXY_TABLE -N $IN_PROXY_CHAIN && iptables -t $IN_PROXY_TABLE -A PREROUTING -j $IN_PROXY_CHAIN)
+
+# Proxy CHN IPs CHAIN
+iptables -t $IN_CHN_IP_TABLE -n -L $IN_CHN_IP_CHAIN >/dev/null 2>&1 \
+  || (iptables -t $IN_CHN_IP_TABLE -N $IN_CHN_IP_CHAIN \
+    && iptables -t $IN_CHN_IP_TABLE -A $IN_CHN_IP_CHAIN -p udp --dport 53 -j TPROXY --on-port $V2RAY_PROXY_PORT --tproxy-mark 1 \
+    && iptables -t $IN_CHN_IP_TABLE -A $IN_CHN_IP_CHAIN -p udp -j TPROXY --on-port $V2RAY_DIRECT_PORT --tproxy-mark 1 \
+    && iptables -t $IN_CHN_IP_TABLE -A $IN_CHN_IP_CHAIN -p tcp -j TPROXY --on-port $V2RAY_DIRECT_PORT --tproxy-mark 1)
 
 ## Flush IN_PROXY_CHAIN
 iptables -t $IN_PROXY_TABLE -F $IN_PROXY_CHAIN
@@ -41,20 +54,23 @@ for i in ${reserved_networks[@]}; do
   iptables -t $IN_PROXY_TABLE -A $IN_PROXY_CHAIN -d $i -j RETURN
 done
 
+## All DNS (port 53, tcp) to v2ray
+iptables -t $IN_PROXY_TABLE -A $IN_PROXY_CHAIN -p tcp --dport 53 -j TPROXY --on-port $V2RAY_PROXY_PORT --tproxy-mark 1
+
 ## All CHN IPs will bypass the proxy
 for i in $(cat /CHN-IPs)
 do
-  iptables -t $IN_PROXY_TABLE -A $IN_PROXY_CHAIN -d $i -j RETURN
+  iptables -t $IN_PROXY_TABLE -A $IN_PROXY_CHAIN -d $i -j $IN_CHN_IP_CHAIN
 done
 
-## Anything else should be proxy
+### Any else tcp will proxy
+iptables -t $IN_PROXY_TABLE -A $IN_PROXY_CHAIN -p tcp -j TPROXY --on-port $V2RAY_PROXY_PORT --tproxy-mark 1
 
-### TCP proxy
-iptables -t $IN_PROXY_TABLE -A $IN_PROXY_CHAIN -p tcp -j TPROXY --on-port 1080 --tproxy-mark 1
+### Not CHN DNS udp use ss proxy
+iptables -t $IN_PROXY_TABLE -A $IN_PROXY_CHAIN -p udp --dport 53 -j TPROXY --on-port $SS_PROXY_PORT --tproxy-mark 1
 
-### UDP proxy( only proxy dns, port 53)
-iptables -t $IN_PROXY_TABLE -A $IN_PROXY_CHAIN -p udp --dport 53 -j TPROXY --on-port 1080 --tproxy-mark 0x01/0x01
-
+### All not CHN ip udp and not 53 port udp go direct by v2ray
+iptables -t $IN_PROXY_TABLE -A $IN_PROXY_CHAIN -p udp -j TPROXY --on-port $V2RAY_DIRECT_PORT --tproxy-mark 1
 
 
 # Proxy local machine traffic
@@ -69,7 +85,7 @@ iptables -t $OUT_MARK_TABLE -n -L $OUT_MARK_CHAIN >/dev/null 2>&1 \
 ## Flush OUT_MARK_CHAIN
 iptables -t $OUT_MARK_TABLE -F $OUT_MARK_CHAIN
 
-## Marked by 0xff(255) is from the v2ray, bypass the proxy
+## Marked by 0xff(255) is from the v2ray, and if is TCP, bypass the proxy
 iptables -t $OUT_MARK_TABLE -A $OUT_MARK_CHAIN -m mark --mark 0xff -j RETURN
 
 ## All reserved network bypass the proxy
@@ -77,15 +93,5 @@ for i in ${reserved_networks[@]}; do
   iptables -t $OUT_MARK_TABLE -A $OUT_MARK_CHAIN -d $i -j RETURN
 done
 
-## All CHN IPs will bypass the proxy
-for i in $(cat /CHN-IPs)
-do
-  iptables -t $OUT_MARK_TABLE -A $OUT_MARK_CHAIN -d $i -j RETURN
-done
-
 ### Mark TCP, and re-routing
-iptables -t $OUT_MARK_TABLE -A $OUT_MARK_CHAIN -p tcp -j MARK --set-mark 1
-
-### UDP proxy. Any DNS query (destination dns server not in CHN) will go through proxy, to prevent DNS cache pollution. TODO: (write a description about this)
-iptables -t $OUT_MARK_TABLE -A $OUT_MARK_CHAIN -p udp --dport 53 -j MARK --set-mark 1 # Mark and re-routing
-
+iptables -t $OUT_MARK_TABLE -A $OUT_MARK_CHAIN -j MARK --set-mark 1

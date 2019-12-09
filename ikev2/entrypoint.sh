@@ -20,9 +20,6 @@ iptables -t mangle -A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss --
 # Start crond
 /usr/sbin/crond
 
-# =============Start DNS server=======================
-named
-
 # =============Start IKEv2 server=====================
 ipsec start
 
