@@ -6,7 +6,7 @@
 	url = https://github.com/bitcoin/bitcoin.git
 [submodule "rsshub/RSSHub"]
 	path = rsshub/RSSHub
-	url = https://github.com/aaftio/RSSHub.git
+	url = git@github.com:code4thought/RSSHub.git
 [submodule "frp/frp"]
 	path = frp/frp
 	url = https://github.com/fatedier/frp.git
