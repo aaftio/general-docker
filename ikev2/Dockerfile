@@ -20,7 +20,6 @@ COPY --from=builder /usr/local/bin/v2ray /usr/bin/v2ray/
 COPY --from=builder /usr/local/bin/v2ctl /usr/bin/v2ray/
 COPY --from=builder /usr/local/share/v2ray/geoip.dat /usr/bin/v2ray/
 COPY --from=builder /usr/local/share/v2ray/geosite.dat /usr/bin/v2ray/
-COPY --from=builder /usr/local/etc/v2ray/config.json /etc/v2ray/
 
 RUN apk --no-cache add ca-certificates \
   && mkdir /var/log/v2ray \
