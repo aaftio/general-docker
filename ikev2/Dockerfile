@@ -1,20 +1,26 @@
-FROM ubuntu:18.04 as builder
+FROM alpine:latest as builder
 
-RUN apt-get update
-RUN apt-get install curl -y
-RUN curl -L -o /tmp/install-release.sh https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh
-RUN chmod +x /tmp/install-release.sh
-RUN /tmp/install-release.sh
+WORKDIR /root
+COPY v2ray.sh /root/v2ray.sh
+
+RUN set -ex \
+	&& apk add --no-cache tzdata openssl ca-certificates \
+	&& mkdir -p /etc/v2ray /usr/local/share/v2ray /var/log/v2ray \
+	&& chmod +x /root/v2ray.sh \
+	&& /root/v2ray.sh linux/arm64
+
+VOLUME /etc/v2ray
+CMD [ "/usr/bin/v2ray", "-config", "/etc/v2ray/config.json" ]
 
 FROM alpine:3.10.3
 LABEL maintainer="panhaipeng <panhaipeng1989@gmail.com>"
 
 # Install v2ray
-COPY --from=builder /usr/bin/v2ray/v2ray /usr/bin/v2ray/
-COPY --from=builder /usr/bin/v2ray/v2ctl /usr/bin/v2ray/
-COPY --from=builder /usr/bin/v2ray/geoip.dat /usr/bin/v2ray/
-COPY --from=builder /usr/bin/v2ray/geosite.dat /usr/bin/v2ray/
-COPY --from=builder /etc/v2ray/config.json /etc/v2ray/
+COPY --from=builder /usr/local/bin/v2ray /usr/bin/v2ray/
+COPY --from=builder /usr/local/bin/v2ctl /usr/bin/v2ray/
+COPY --from=builder /usr/local/share/v2ray/geoip.dat /usr/bin/v2ray/
+COPY --from=builder /usr/local/share/v2ray/geosite.dat /usr/bin/v2ray/
+COPY --from=builder /usr/local/etc/v2ray/config.json /etc/v2ray/
 
 RUN apk --no-cache add ca-certificates \
   && mkdir /var/log/v2ray \
