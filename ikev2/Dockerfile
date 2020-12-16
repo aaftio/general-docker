@@ -2,9 +2,7 @@ FROM ubuntu:18.04 as builder
 
 RUN apt-get update
 RUN apt-get install curl -y
-RUN curl -L -o /tmp/go.sh https://install.direct/go.sh
-RUN chmod +x /tmp/go.sh
-RUN /tmp/go.sh
+RUN bash <(curl -L https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh)
 
 FROM alpine:3.10.3
 LABEL maintainer="panhaipeng <panhaipeng1989@gmail.com>"
