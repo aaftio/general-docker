@@ -2,7 +2,9 @@ FROM ubuntu:18.04 as builder
 
 RUN apt-get update
 RUN apt-get install curl -y
-RUN bash <(curl -L https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh)
+RUN curl -L -o /tmp/install-release.sh https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh
+RUN chmod +x /tmp/install-release.sh
+RUN /tmp/install-release.sh
 
 FROM alpine:3.10.3
 LABEL maintainer="panhaipeng <panhaipeng1989@gmail.com>"
