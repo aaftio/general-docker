@@ -16,8 +16,8 @@ FROM alpine:3.10.3
 LABEL maintainer="panhaipeng <panhaipeng1989@gmail.com>"
 
 # Install v2ray
-COPY --from=builder /usr/local/bin/v2ray /usr/bin/v2ray/
-COPY --from=builder /usr/local/bin/v2ctl /usr/bin/v2ray/
+COPY --from=builder /usr/bin/v2ray /usr/bin/v2ray/
+COPY --from=builder /usr/bin/v2ctl /usr/bin/v2ray/
 COPY --from=builder /usr/local/share/v2ray/geoip.dat /usr/bin/v2ray/
 COPY --from=builder /usr/local/share/v2ray/geosite.dat /usr/bin/v2ray/
 
